@@ -9,9 +9,12 @@ from .builder import build_image_from_directory, load_image, save_image
 from .server import api
 
 app = Typer(name="MakiNet Control Plane", help="Control Plane for MakiNet")
+image_typer = Typer(name="image", help="Image related commands")
+
+app.add_typer(image_typer)
 
 
-@app.command("build")
+@image_typer.command("build")
 def build_image(
     source_path: Annotated[
         Path, Option("--source", "--src", "-s", help="Path to build")
@@ -35,7 +38,7 @@ def build_image(
     logger.success(f"File Path: {output_path.absolute().as_posix()}")
 
 
-@app.command("load")
+@image_typer.command("load")
 def load(
     image_path: Annotated[
         Path, Option("--image", "--img", "-i", help="Path to image")
