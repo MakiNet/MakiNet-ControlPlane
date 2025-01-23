@@ -5,6 +5,7 @@ import uvicorn
 from loguru import logger
 from typer import Option, Typer
 
+from . import utils
 from .builder import build_image_from_directory, load_image, save_image
 from .server import api
 
@@ -71,14 +72,21 @@ def load(
 def server(
     debug: Annotated[bool, Option("--debug", "-v", help="Enable debug mode")] = False,
     host: Annotated[str, Option("--host", "-h", help="Host to bind to")] = "0.0.0.0",
-    port: Annotated[int, Option("--port", "-p", help="Port to bind to")] = 8000,
+    port: Annotated[int, Option("--port", "-p", help="Port to bind to")] = 10513,
+    cert_file_dir: Annotated[
+        Path, Option("--certs", help="Path to certificates")
+    ] = utils.DEFAULT_CERT_FILE_DIR,
 ):
     api.debug = debug
+
+    keyfile, certfile = utils.check_certs(cert_file_dir)
 
     uvicorn.run(
         api,
         host=host,
         port=port,
+        ssl_keyfile=keyfile,
+        ssl_certfile=certfile,
     )
 
 
