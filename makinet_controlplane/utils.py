@@ -1,11 +1,21 @@
 from pathlib import Path
 from socket import gethostname
 
+from apscheduler.executors.asyncio import AsyncIOExecutor
+from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loguru import logger
 from OpenSSL import crypto
 
 DEFAULT_CERT_FILE_DIR = Path.home().joinpath(".local/share/makinet/certs")
-_BACKGROUND_TASKS = []
+# Attention: only run after server command be called
+TASK_SCHEDULER = AsyncIOScheduler(
+    executors={
+        "default": AsyncIOExecutor(),
+        "thread-pool": ThreadPoolExecutor(20),
+        "process-pool": ProcessPoolExecutor(5),
+    }
+)
 
 
 def generate_self_signed_certs(
